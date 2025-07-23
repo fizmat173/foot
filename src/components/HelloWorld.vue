@@ -14,7 +14,7 @@
       </v-col>
     </v-row>
     <v-row>
-      {{el}}
+      {{ el }}
     </v-row>
     <v-row>
       <v-text-field v-model="el" />
