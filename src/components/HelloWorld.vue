@@ -1,107 +1,87 @@
 <template>
-  <v-container>
-    <v-row align="center" justify="center">
-      <v-col cols="auto">
-        <v-btn density="compact" rounded="xl" @click="FirstButtonClick">первая Button</v-btn>
-      </v-col>
-
-      <v-col cols="auto">
-        <v-btn density="comfortable" @click="AddRow">вторая Button</v-btn>
-      </v-col>
-
-      <v-col cols="auto">
-        <v-btn density="default" @click="ThreeButtonClick">Default Button</v-btn>
-      </v-col>
-    </v-row>
+  <v-container class="fill-hight" fluid>
     <v-row>
-      {{ el }}
-    </v-row>
-    <v-row>
-      <v-text-field v-model="el" />
-    </v-row>
-  </v-container>
-  <v-table>
-    <thead>
-      <tr>
-        <th class="text-left">
-          Name
-        </th>
-        <th class="text-left">
-          Calories
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="item in desserts"
-        :key="item.name"
+      <v-col
+        v-for="(league, index) in paginatedLeagues"
+        :key="index"
+        cols="12"
+        md="4"
+        sm="6"
       >
-        <td>{{ item.name }}</td>
-        <td>{{ item.calories }}</td>
-      </tr>
-    </tbody>
-  </v-table>
+        <v-card class="league-card flex-grow-1 d-flex flex-column">
+          <v-card-title class="v-card-title"> {{ league.name }} </v-card-title>
+          <v-card-subtitle class="v-card-subtitle"> {{ league.area.name }} </v-card-subtitle>
+          <v-spacer />
+          <v-card-actions class="justify-center flex-grow-0">
+            <v-btn color="primary">Подробнее...</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-pagination
+      v-model="page"
+      class="v.pagination"
+      :length="totalPages"
+      :total-visible="7"
+    />
+  </v-container>
 </template>
 
 <script>
+  import axios from 'axios'
   export default {
     data () {
       return {
-        el: 'привет',
-        desserts: [
-          {
-            name: 'Frozen Yogurt',
-            calories: 159,
-          },
-          {
-            name: 'Ice cream sandwich',
-            calories: 237,
-          },
-          {
-            name: 'Eclair',
-            calories: 262,
-          },
-          {
-            name: 'Cupcake',
-            calories: 305,
-          },
-          {
-            name: 'Gingerbread',
-            calories: 356,
-          },
-          {
-            name: 'Jelly bean',
-            calories: 375,
-          },
-          {
-            name: 'Lollipop',
-            calories: 392,
-          },
-          {
-            name: 'Honeycomb',
-            calories: 408,
-          },
-          {
-            name: 'Donut',
-            calories: 452,
-          },
-          {
-            name: 'KitKat',
-            calories: 518,
-          },
-        ],
+        leagues: [],
+        page: 1,
+        ItemsPerPage: 12,
       }
     },
-    methods: {
-      FirstButtonClick () {
-        console.log('привет')
+    computed: {
+      totalPages () {
+        return Math.ceil(this.leagues.length / this.ItemsPerPage)
       },
-      AddRow () {
-        this.desserts.push({ name: 'новый элемент', calories: '1000' })
+      paginatedLeagues () {
+        const start = (this.page - 1) * this.ItemsPerPage
+        const end = start + this.ItemsPerPage
+        return this.leagues.slice(start, end)
       },
-      ThreeButtonClick () {
-        this.el = 'пока!'
-      },
+    },
+    mounted () {
+      axios.get('api/v2/competitions')
+        .then(response => this.leagues = response.data.competitions)
+        .catch(error => console.error(error))
     },
   }
 </script>
+<style scoped>
+.league-card{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: transform 0.3s;
+  margin-bottom: 16px;
+}
+.league-card:hover{
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.v-card-title {
+  font-size: 1.2rem;
+  font-weight: hold;
+  padding-bottom: 0;
+}
+
+.v-card-subtitle {
+  font-size: 1rem;
+  padding-top: 0;
+}
+
+v.pagination {
+  justify-content: center;
+}
+
+</style>
+
