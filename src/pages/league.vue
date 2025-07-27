@@ -1,7 +1,7 @@
 <template>
-  <Leagues />
+  <Matches />
 </template>
 
-<script setup>
-  //
+<script>
+
 </script>
