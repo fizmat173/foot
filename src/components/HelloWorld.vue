@@ -84,4 +84,3 @@ v.pagination {
 }
 
 </style>
-
