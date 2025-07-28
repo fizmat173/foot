@@ -1,15 +1,13 @@
-import path from 'node:path'
-import { fileURLToPath, URL } from 'node:url'
-import Vue from '@vitejs/plugin-vue'
-import Fonts from 'unplugin-fonts/vite'
 // Plugins
 import Components from 'unplugin-vue-components/vite'
-
+import Vue from '@vitejs/plugin-vue'
+import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+import Fonts from 'unplugin-fonts/vite'
 import VueRouter from 'unplugin-vue-router/vite'
 
 // Utilities
 import { defineConfig } from 'vite'
-import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -50,7 +48,7 @@ export default defineConfig({
   define: { 'process.env': {} },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('src', import.meta.url)),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
     extensions: [
       '.js',
@@ -66,11 +64,12 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://api.football-data.org',
+        target: 'https://api.football-data.org', // Ваш API сервер
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''),
-        secure: false,
+        secure: false, // Если нужен обход SSL
       },
+
     },
   },
   css: {
