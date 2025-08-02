@@ -1,14 +1,13 @@
 <template>
   <header class="header">
     <nav class="nav-container">
-      <!-- Логотип слева -->
+      
       
       
       <!-- Навигационные ссылки -->
       <div class="links">
         <img src="@/assets/vecteezy.jpg" alt="Логотип" class="logo" />
         <router-link to="/">Лиги</router-link>
-        <!-- <router-link to="/matches">Матчи</router-link> -->
         <router-link to="/teams">Команды</router-link>
       </div>
       <div class="footer-text">
@@ -42,8 +41,8 @@ export default {
 
 /* Стили для логотипа */
 .logo {
-  height: 48px;           /* Можно подкорректировать размер */
-  margin-right: 1rem;     /* Отступ справа от логотипа */
+  height: 48px;           
+  margin-right: 1rem;     
 }
 
 .links {
@@ -56,10 +55,10 @@ export default {
   color: white;
   margin-right: 1.5rem;
   text-decoration: none;
-  font-size: 1.15rem; /* чуть больше шрифт */
-  line-height: 1; /* уменьшить междустрочный интервал */
+  font-size: 1.15rem; 
+  line-height: 1;
   display: flex;
-  align-items: center; /* для выравнивания по базовой линии */
+  align-items: center; 
 }
 
 .links a.router-link-active {
@@ -70,7 +69,7 @@ export default {
 
 .footer-text {
   text-align: right;
-  white-space: pre-line; /* чтобы учесть перенос строки, но в данном примере мы используем br */
+  white-space: pre-line; 
   font-size: 0.9rem;
   line-height: 1.2;
 }

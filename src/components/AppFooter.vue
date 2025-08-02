@@ -126,7 +126,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
-  flex-grow: 1; /* растягивает этот блок при необходимости */
+  flex-grow: 1; 
   min-width: 200px;
 }
 
@@ -138,13 +138,13 @@ export default {
 }
 
 .footer-link:hover {
-  color: #1976d2; /* такой же синий акцент как в хедере */
+  color: #1976d2; 
 }
 
 .footer-text {
   text-align: right;
   white-space: nowrap;
-  flex-shrink: 0; /* не сжимать текст копирайта */
+  flex-shrink: 0; 
   min-width: 180px;
 }
 
