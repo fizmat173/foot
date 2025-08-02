@@ -14,5 +14,7 @@ declare module 'vue' {
     Matches: typeof import('./src/components/Matches.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Team: typeof import('./src/components/Teams.vue')['default']
+    Teams: typeof import('./src/components/Teams.vue')['default']
   }
 }

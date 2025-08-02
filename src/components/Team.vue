@@ -12,7 +12,7 @@
       </v-col>
     </v-row>
 
-    <!-- Блок выбора дат -->
+    <!-- Блок выбора диапазона дат -->
     <v-row class="date-picker-row" dense align="center" no-gutters>
       <v-col cols="auto" class="d-flex align-center">
         <span style="margin-right: 8px; white-space: nowrap;">с</span>
@@ -21,9 +21,9 @@
           label="Дата с"
           readonly
           clearable
+          prepend-inner-icon="mdi-calendar"
           @click="showDatePickerFrom = true"
           @click:clear="clearDate('from')"
-          prepend-inner-icon="mdi-calendar"
           outlined
           style="min-width: 220px;"
         />
@@ -52,9 +52,9 @@
           label="Дата по"
           readonly
           clearable
+          prepend-inner-icon="mdi-calendar"
           @click="showDatePickerTo = true"
           @click:clear="clearDate('to')"
-          prepend-inner-icon="mdi-calendar"
           outlined
           style="min-width: 220px;"
         />
@@ -68,8 +68,8 @@
         >
           <v-date-picker
             v-model="dateTo"
-            @update:model-value="showDatePickerTo = false"
             first-day-of-week="1"
+            @update:model-value="showDatePickerTo = false"
           />
         </v-menu>
       </v-col>
@@ -86,7 +86,7 @@
       :items="filteredMatches"
     >
       <template #item.utcDate="{ item }">
-        {{ formatDateTime(item.utcDate) }}
+        {{ new Date(item.utcDate).toLocaleString() }}
       </template>
       <template #item.status="{ item }">
         <v-chip :color="getStatusColor(item.status)" small>
@@ -110,14 +110,12 @@
 import api from '@/api'
 
 export default {
-  data() {
+  data () {
     return {
       dateFrom: null,
       dateTo: null,
       showDatePickerFrom: false,
       showDatePickerTo: false,
-      page: 1,
-      itemsPerPage: 12,
       matches: [],
       isLoading: false,
       headers: [
@@ -129,82 +127,59 @@ export default {
     }
   },
   computed: {
-    formattedDateFrom() {
-      return this.formatDate(this.dateFrom)
+    formattedDateFrom () {
+      return this.dateFrom
+        ? this.formatDate(this.dateFrom)
+        : ''
     },
-    formattedDateTo() {
-      return this.formatDate(this.dateTo)
+    formattedDateTo () {
+      return this.dateTo
+        ? this.formatDate(this.dateTo)
+        : ''
     },
-    filteredMatches() {
-      if (!this.dateFrom && !this.dateTo) return this.matches
-      
+    filteredMatches () {
       return this.matches.filter(match => {
         const matchDate = new Date(match.utcDate)
-        const startDate = this.dateFrom ? new Date(this.dateFrom) : null
-        let endDate = this.dateTo ? new Date(this.dateTo) : null
-        
-        // Корректировка конечной даты (до конца дня)
-        if (endDate) {
-          endDate = new Date(endDate)
-          endDate.setHours(23, 59, 59, 999)
+        // начало дня фильтрующей даты
+        const start = this.dateFrom
+          ? new Date(this.dateFrom)
+          : null
+        // конец дня фильтрующей даты
+        let end = this.dateTo
+          ? new Date(this.dateTo)
+          : null
+        if (end) {
+          end.setHours(23,59,59,999)
         }
-        
-        if (startDate && matchDate < startDate) {
-          return false
-        }
-        if (endDate && matchDate > endDate) {
-          return false
-        }
+        if (start && matchDate < start) return false
+        if (end && matchDate > end) return false
         return true
       })
     },
   },
-  mounted() {
+  mounted () {
     this.loadMatches()
   },
   methods: {
-    formatDate(date) {
-      if (!date) return ''
-      // Проверяем формат даты (может приходить как строка или объект Date)
-      const dateObj = typeof date === 'string' ? new Date(date) : date
-      
-      // Форматируем в YYYY-MM-DD для правильной работы date-picker
-      const year = dateObj.getFullYear()
-      const month = (dateObj.getMonth() + 1).toString().padStart(2, '0')
-      const day = dateObj.getDate().toString().padStart(2, '0')
-      
-      return `${day}.${month}.${year}`
+    formatDate (date) {
+      const d = typeof date === 'string' ? new Date(date) : date
+      const dd = String(d.getDate()).padStart(2,'0')
+      const mm = String(d.getMonth()+1).padStart(2,'0')
+      const yyyy = d.getFullYear()
+      return `${dd}.${mm}.${yyyy}`
     },
-    
-    formatDateTime(dateString) {
-      if (!dateString) return ''
-      const date = new Date(dateString)
-      return date.toLocaleString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+    clearDate (type) {
+      if (type === 'from') this.dateFrom = null
+      else this.dateTo = null
     },
-    
-    clearDate(type) {
-      if (type === 'from') {
-        this.dateFrom = null
-      } else {
-        this.dateTo = null
-      }
-    },
-    
-    clearFilter() {
+    clearFilter () {
       this.dateFrom = null
       this.dateTo = null
       this.showDatePickerFrom = false
       this.showDatePickerTo = false
     },
-    
-    getStatusText(status) {
-      const statusMap = {
+    getStatusText (status) {
+      const map = {
         FINISHED: 'Матч завершен',
         SCHEDULED: 'Запланирован',
         LIVE: 'В прямом эфире',
@@ -214,11 +189,10 @@ export default {
         POSTPONED: 'Отложен',
         IN_PLAY: 'В игре'
       }
-      return statusMap[status] || status
+      return map[status] || status
     },
-    
-    getStatusColor(status) {
-      const statusMap = {
+    getStatusColor (status) {
+      const map = {
         FINISHED: 'green',
         SCHEDULED: 'blue',
         LIVE: 'red',
@@ -228,62 +202,45 @@ export default {
         POSTPONED: 'deep-purple',
         IN_PLAY: 'light-green',
       }
-      return statusMap[status] || status
+      return map[status] || 'grey'
     },
-    
-    loadMatches() {
+    loadMatches () {
       this.isLoading = true
-      const leagueId = this.$route.query.id
-      api.get(`api/v4/competitions/${leagueId}/matches`)
-        .then(response => this.matches = response.data.matches)
-        .catch(error => console.error(error))
-        .finally(() => this.isLoading = false)
+      const teamId = this.$route.query.id
+      api.get(`api/v4/teams/${teamId}/matches`)
+        .then(response => {
+          this.matches = response.data.matches
+        })
+        .catch(err => console.error('Ошибка при загрузке матчей:', err))
+        .finally(() => {
+          this.isLoading = false
+        })
     },
-    
-    formatScore(score) {
-          if (!score) return '-:-';
-  
-          const parts = [];
-  
-          // Основное время
-          const ft = score.fullTime || {};
-          parts.push(
-            (ft.home !== null && ft.home !== undefined &&
-            ft.away !== null && ft.away !== undefined)
-            ? `${ft.home}:${ft.away}`
-              : '-:-'
-          );
-  
-          // Дополнительное время
-          const et = score.extraTime || {};
-          if (et.home !== null && et.home !== undefined &&
-              et.away !== null && et.away !== undefined) {
-              parts.push(`(${et.home}:${et.away})`);
-          }
-  
-            // Пенальти
-          const pen = score.penalties || {};
-          if (pen.home !== null && pen.home !== undefined &&
-              pen.away !== null && pen.away !== undefined) {
-              parts.push(`(${pen.home}:${pen.away})`);
-          }
-  
-        return parts.join(' ');
-        }
+    formatScore (score) {
+      if (!score) return '-:-'
+      const parts = []
+      const ft = score.fullTime || {}
+      parts.push(
+        ft.home!=null && ft.away!=null
+          ? `${ft.home}:${ft.away}`
+          : '-:-'
+      )
+      const et = score.extraTime || {}
+      if (et.home!=null && et.away!=null) {
+        parts.push(`(${et.home}:${et.away})`)
+      }
+      const pen = score.penalties || {}
+      if (pen.home!=null && pen.away!=null) {
+        parts.push(`(${pen.home}:${pen.away})`)
+      }
+      return parts.join(' ')
+    }
   }
 }
 </script>
 
 <style scoped>
-/* Стили для позиционирования календарей */
 .v-menu__content {
   z-index: 1000;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-/* Стиль для выбранной даты в календаре */
-.v-date-picker-controls__date .v-btn--active {
-  background-color: #1976d2 !important;
-  color: white !important;
 }
 </style>

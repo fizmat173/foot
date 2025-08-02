@@ -18,7 +18,7 @@
   }
 </script>
 
-<style>
+<style scoped>
 .layout {
   min-height: 100vh;
   display: flex;
@@ -28,5 +28,11 @@
 main {
   flex: 1;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.footer {
+  /* match height to padding-bottom if needed */
 }
 </style>

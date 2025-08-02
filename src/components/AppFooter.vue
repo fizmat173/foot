@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <v-footer
     app
     height="40"
@@ -79,4 +79,93 @@
 
     &:hover
       color: rgba(25, 118, 210, 1)
+</style> -->
+
+
+<template>
+  <footer class="footer">
+    <nav class="footer-nav">
+      <a href="#" class="footer-link">О нас</a>
+      <a href="#" class="footer-link">Контакты</a>
+      <a href="#" class="footer-link">Политика конфиденциальности</a>
+      <a href="#" class="footer-link">Помощь</a>
+    </nav>
+    <div class="footer-text">
+      &copy; 2016-{{ currentYear }} SoccerStat — Все права защищены
+    </div>
+  </footer>
+</template>
+
+<script>
+export default {
+  name: 'AppFooter',
+  data() {
+    return {
+      currentYear: new Date().getFullYear()
+    }
+  }
+}
+</script>
+
+<style scoped>
+.footer {
+  background: #333;
+  color: white;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 40px;
+  font-size: 0.9rem;
+  flex-wrap: wrap; /* чтобы адаптироваться на маленьких экранах */
+  gap: 0.5rem;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  flex-grow: 1; /* растягивает этот блок при необходимости */
+  min-width: 200px;
+}
+
+.footer-link {
+  color: white;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.footer-link:hover {
+  color: #1976d2; /* такой же синий акцент как в хедере */
+}
+
+.footer-text {
+  text-align: right;
+  white-space: nowrap;
+  flex-shrink: 0; /* не сжимать текст копирайта */
+  min-width: 180px;
+}
+
+/* Медиазапрос для узких экранов */
+@media (max-width: 600px) {
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-nav {
+    order: 2;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .footer-text {
+    order: 1;
+    margin-bottom: 0.5rem;
+    width: 100%;
+    text-align: left;
+  }
+}
 </style>
